@@ -7,7 +7,6 @@ import {
   ExternalLinkIcon,
   FileJsonIcon,
   HardDriveDownloadIcon,
-  Loader2Icon,
   RefreshCwIcon,
   ShieldCheckIcon,
 } from "lucide-react";
@@ -28,8 +27,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const REALM_META: Record<Realm, { label: string; host: string }> = {
@@ -79,7 +79,7 @@ function LoginStep({
         {state === "done" ? (
           <CheckCircle2Icon className="size-3.5" />
         ) : state === "active" ? (
-          <Loader2Icon className="size-3.5 animate-spin" />
+          <Spinner className="size-3.5" />
         ) : state === "error" ? (
           <AlertTriangleIcon className="size-3.5" />
         ) : (
@@ -299,7 +299,7 @@ export function AddAccountDialog({
             </Alert>
           ) : message ? (
             <Alert>
-              {phase === "ok" ? <ShieldCheckIcon /> : <Loader2Icon className="animate-spin" />}
+              {phase === "ok" ? <ShieldCheckIcon /> : <Spinner />}
               <AlertTitle>{phase === "ok" ? "已加入账号池" : "等待授权"}</AlertTitle>
               <AlertDescription>{message}</AlertDescription>
             </Alert>
@@ -546,7 +546,7 @@ export function ImportAccountsDialog({
               取消
             </Button>
             <Button disabled={!canCommit || busy} onClick={() => void commit()}>
-              {busy ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : null}
+              {busy ? <Spinner data-icon="inline-start" /> : null}
               确认导入 {added + updated > 0 ? added + updated : ""}
             </Button>
           </div>
@@ -708,7 +708,7 @@ export function DesktopImportDialog({
                       onClick={() => void importEntry(entry)}
                     >
                       {importingPath === entry.path ? (
-                        <Loader2Icon data-icon="inline-start" className="animate-spin" />
+                        <Spinner data-icon="inline-start" />
                       ) : (
                         <HardDriveDownloadIcon data-icon="inline-start" />
                       )}
@@ -757,7 +757,7 @@ export function DesktopImportDialog({
                   {atrest.huntSupported ? (
                     <Button size="sm" variant="outline" disabled={recovering} onClick={() => void recoverKey()}>
                       {recovering ? (
-                        <Loader2Icon data-icon="inline-start" className="animate-spin" />
+                        <Spinner data-icon="inline-start" />
                       ) : (
                         <ShieldCheckIcon data-icon="inline-start" />
                       )}
@@ -780,9 +780,13 @@ export function DesktopImportDialog({
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : scanning ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3" aria-busy="true" aria-label="正在扫描本机账号">
               <div className="text-xs text-muted-foreground">正在检测本机桌面客户端账号…</div>
-              <Progress value={60} className="animate-pulse" />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-10 w-full rounded-lg" />
+                <Skeleton className="h-10 w-full rounded-lg" />
+                <Skeleton className="h-10 w-2/3 rounded-lg" />
+              </div>
             </div>
           ) : scanned && !detected.length ? (
             <div className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
@@ -802,7 +806,11 @@ export function DesktopImportDialog({
 
         <DialogFooter>
           <Button variant="outline" disabled={scanning} onClick={() => void scan()}>
-            <RefreshCwIcon data-icon="inline-start" className={scanning ? "animate-spin" : undefined} />
+            {scanning ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <RefreshCwIcon data-icon="inline-start" />
+            )}
             重新扫描
           </Button>
           <Button onClick={() => onOpenChange(false)}>关闭</Button>

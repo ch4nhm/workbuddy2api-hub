@@ -30,10 +30,12 @@ import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   EmptyState,
   MetricCard,
@@ -218,12 +220,14 @@ export function TasksPage({ dashboard }: { dashboard: DashboardController }) {
                 <SelectValue placeholder="选择账号" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部账号</SelectItem>
-                {accounts.map((account) => (
-                  <SelectItem key={account.uid} value={account.uid}>
-                    {account.nickname}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectItem value="all">全部账号</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.uid} value={account.uid}>
+                      {account.nickname}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
             <Button
@@ -232,7 +236,11 @@ export function TasksPage({ dashboard }: { dashboard: DashboardController }) {
               disabled={Boolean(busy)}
               onClick={() => void run("refresh", "/tasks/run", scope, "任务已重新执行")}
             >
-              <RefreshCwIcon data-icon="inline-start" className={busy === "refresh" ? "animate-spin" : undefined} />
+              {busy === "refresh" ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <RefreshCwIcon data-icon="inline-start" />
+              )}
               刷新任务
             </Button>
           </>
@@ -279,7 +287,11 @@ export function TasksPage({ dashboard }: { dashboard: DashboardController }) {
               disabled={Boolean(busy)}
               onClick={() => void run("travel", "/tasks/travel", scope, "旅行任务已提交")}
             >
-              <RouteIcon data-icon="inline-start" className={busy === "travel" ? "animate-spin" : undefined} />
+              {busy === "travel" ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <RouteIcon data-icon="inline-start" />
+              )}
               出发
             </Button>
           }
@@ -338,7 +350,11 @@ export function TasksPage({ dashboard }: { dashboard: DashboardController }) {
               disabled={Boolean(busy)}
               onClick={() => void run("streak", "/tasks/streak-bonus", scope, "连签奖励已领取")}
             >
-              <FlameIcon data-icon="inline-start" className={busy === "streak" ? "animate-spin" : undefined} />
+              {busy === "streak" ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <FlameIcon data-icon="inline-start" />
+              )}
               领取连签奖励
             </Button>
           </div>
@@ -390,7 +406,11 @@ export function TasksPage({ dashboard }: { dashboard: DashboardController }) {
                 disabled={Boolean(busy)}
                 onClick={() => void run("trigger", "/scheduler/trigger", {}, "已触发一次巡检")}
               >
-                <PlayIcon data-icon="inline-start" className={busy === "trigger" ? "animate-spin" : undefined} />
+                {busy === "trigger" ? (
+                  <Spinner data-icon="inline-start" />
+                ) : (
+                  <PlayIcon data-icon="inline-start" />
+                )}
                 立即巡检
               </Button>
             </div>
@@ -407,7 +427,11 @@ export function TasksPage({ dashboard }: { dashboard: DashboardController }) {
             disabled={Boolean(busy)}
             onClick={() => void run("run", "/tasks/run", scope, "任务已开始执行")}
           >
-            <ZapIcon data-icon="inline-start" className={busy === "run" ? "animate-spin" : undefined} />
+            {busy === "run" ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <ZapIcon data-icon="inline-start" />
+            )}
             一键做任务领积分
           </Button>
         }

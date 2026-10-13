@@ -33,6 +33,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDashboard, type DashboardController } from "@/hooks/use-dashboard";
@@ -295,7 +296,7 @@ function Toolbar({ dashboard }: { dashboard: DashboardController }) {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="outline" size="icon-sm" onClick={() => void refresh()} disabled={refreshing}>
-            <RefreshCwIcon className={refreshing ? "animate-spin" : undefined} />
+            {refreshing ? <Spinner /> : <RefreshCwIcon />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>刷新数据</TooltipContent>

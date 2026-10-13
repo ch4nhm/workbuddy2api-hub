@@ -250,6 +250,38 @@
     0 14px 40px color-mix(in oklab, var(--primary) 7%, transparent);
 }
 
+/*
+ * 全局筛选 / 核心指标栏吸顶：滚动锁定后加深底色、拉出下阴影并描一层蓝色边，
+ * 与未固定状态区分；过渡统一 220ms ease-out，避免生硬跳变。
+ */
+.analytics-filterbar {
+  transition:
+    background-color 220ms ease-out,
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out;
+}
+
+.analytics-filterbar.is-sticky {
+  border-bottom-color: color-mix(in oklab, var(--primary) 26%, transparent);
+  background-color: color-mix(in oklab, var(--content) 94%, transparent);
+  box-shadow: 0 16px 34px -24px color-mix(in oklab, var(--foreground) 62%, transparent);
+}
+
+.analytics-filterbar.is-sticky .glass-panel {
+  border-color: color-mix(in oklab, var(--primary) 22%, transparent);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 10px 30px color-mix(in oklab, var(--primary) 12%, transparent);
+}
+
+/* Bento 拖拽：被拖起的模块抬升，与其余模块拉开层次。 */
+[data-slot="card"][data-bento-dragging="true"] {
+  border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 30px 60px -24px color-mix(in oklab, var(--primary) 45%, transparent);
+}
+
 .status-dot {
   position: relative;
 }

@@ -82,6 +82,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -148,9 +150,12 @@ function SettingSwitch({
 
 function InfoRow({ label, value, mono = true }: { label: string; value: ReactNode; mono?: boolean }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-t border-border/50 py-2 first:border-t-0 first:pt-0">
-      <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
-      <span className={cn("min-w-0 break-all text-right text-xs", mono && "font-mono")}>{value}</span>
+    <div className="group/info">
+      <Separator className="bg-border/50 group-first/info:hidden" />
+      <div className="flex items-start justify-between gap-4 py-2 group-first/info:pt-0">
+        <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
+        <span className={cn("min-w-0 break-all text-right text-xs", mono && "font-mono")}>{value}</span>
+      </div>
     </div>
   );
 }
@@ -326,7 +331,7 @@ function SecurityTab({ dashboard }: { dashboard: DashboardController }) {
           <div className="mt-4 flex justify-end">
             <Button disabled={savingPwd} onClick={() => void changePassword()}>
               {savingPwd ? (
-                <RefreshCwIcon data-icon="inline-start" className="animate-spin" />
+                <Spinner data-icon="inline-start" />
               ) : (
                 <ShieldCheckIcon data-icon="inline-start" />
               )}
@@ -462,7 +467,7 @@ function SecurityTab({ dashboard }: { dashboard: DashboardController }) {
           <div className="mt-4 flex justify-end">
             <Button disabled={savingWinMax} onClick={() => void saveWinMaxHeight()}>
               {savingWinMax ? (
-                <RefreshCwIcon data-icon="inline-start" className="animate-spin" />
+                <Spinner data-icon="inline-start" />
               ) : (
                 <CheckIcon data-icon="inline-start" />
               )}
@@ -1089,7 +1094,7 @@ function LimitsRefreshTab({ dashboard }: { dashboard: DashboardController }) {
             </div>
             <Button size="sm" disabled={savingLimits} onClick={() => void saveLimits()}>
               {savingLimits ? (
-                <RefreshCwIcon data-icon="inline-start" className="animate-spin" />
+                <Spinner data-icon="inline-start" />
               ) : (
                 <CheckIcon data-icon="inline-start" />
               )}
@@ -1318,7 +1323,11 @@ function PricingStatusCard({ enabled }: { enabled: boolean }) {
       action={
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" disabled={!enabled || loading} onClick={() => void load()}>
-            <RefreshCwIcon data-icon="inline-start" className={loading ? "animate-spin" : undefined} />
+            {loading ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <RefreshCwIcon data-icon="inline-start" />
+            )}
             刷新状态
           </Button>
           <Button size="sm" disabled={!enabled || refreshing} onClick={() => void refreshNow()}>
@@ -1366,7 +1375,7 @@ function PricingStatusCard({ enabled }: { enabled: boolean }) {
           ) : null}
 
           <div className="rounded-lg border border-border/60">
-            <div className="flex items-center justify-between gap-2 border-b border-border/60 px-3 py-2 text-xs text-muted-foreground">
+            <div className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <InfoIcon />
                 未定价模型 {summary.total ?? 0} 个
@@ -1376,12 +1385,13 @@ function PricingStatusCard({ enabled }: { enabled: boolean }) {
                 {summary.aliases ?? 0}
               </span>
             </div>
+            <Separator className="bg-border/60" />
             {gaps.length ? (
-              <div className="max-h-72 overflow-auto">
+              <div className="max-h-72 divide-y divide-border/50 overflow-auto">
                 {gaps.map((gap) => (
                   <div
                     key={gap.model}
-                    className="flex flex-wrap items-center gap-2 border-t border-border/50 px-3 py-2 text-xs first:border-t-0"
+                    className="flex flex-wrap items-center gap-2 px-3 py-2 text-xs"
                   >
                     <span className="min-w-40 flex-1 truncate font-mono">{gap.model}</span>
                     <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning">
@@ -1856,7 +1866,11 @@ function AdvancedTab({ dashboard }: { dashboard: DashboardController }) {
               <span className="text-xs text-muted-foreground">每天自动检查</span>
             </div>
             <Button variant="outline" size="sm" disabled={checking} onClick={() => void checkUpdate()}>
-              <RefreshCwIcon data-icon="inline-start" className={checking ? "animate-spin" : undefined} />
+              {checking ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <RefreshCwIcon data-icon="inline-start" />
+              )}
               立即检查
             </Button>
           </div>
@@ -1871,7 +1885,11 @@ function AdvancedTab({ dashboard }: { dashboard: DashboardController }) {
             <div className="flex flex-wrap items-center justify-end gap-2">
               <Badge variant={slotsDirty ? "destructive" : "outline"}>{slots.length} 个</Badge>
               <Button variant="outline" size="sm" disabled={discovering} onClick={() => void discover()}>
-                <RadioTowerIcon data-icon="inline-start" className={discovering ? "animate-pulse" : undefined} />
+                {discovering ? (
+                  <Spinner data-icon="inline-start" />
+                ) : (
+                  <RadioTowerIcon data-icon="inline-start" />
+                )}
                 自动发现
               </Button>
               <Button
@@ -1886,7 +1904,7 @@ function AdvancedTab({ dashboard }: { dashboard: DashboardController }) {
               </Button>
               <Button size="sm" disabled={savingSlots || !slotsDirty} onClick={() => void saveSlots()}>
                 {savingSlots ? (
-                  <RefreshCwIcon data-icon="inline-start" className="animate-spin" />
+                  <Spinner data-icon="inline-start" />
                 ) : (
                   <CheckIcon data-icon="inline-start" />
                 )}
@@ -1961,7 +1979,7 @@ function AdvancedTab({ dashboard }: { dashboard: DashboardController }) {
                         onClick={() => void testSlot(index)}
                       >
                         {testingSlot === (slot.id || slot.url) ? (
-                          <RefreshCwIcon data-icon="inline-start" className="animate-spin" />
+                          <Spinner data-icon="inline-start" />
                         ) : (
                           <ActivityIcon data-icon="inline-start" />
                         )}
@@ -2091,7 +2109,11 @@ export function SettingsPage({ dashboard }: { dashboard: DashboardController }) 
               版本 {settings?.version || "—"}
             </Badge>
             <Button variant="outline" size="sm" disabled={refreshing} onClick={() => void refresh()}>
-              <RefreshCwIcon data-icon="inline-start" className={refreshing ? "animate-spin" : undefined} />
+              {refreshing ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <RefreshCwIcon data-icon="inline-start" />
+              )}
               刷新设置
             </Button>
           </>

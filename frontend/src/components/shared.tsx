@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, DragEvent, ReactNode } from "react";
 import { motion } from "motion/react";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
@@ -149,6 +149,11 @@ export function SectionCard({
   children,
   className,
   capped = true,
+  draggable = false,
+  dragging = false,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
 }: {
   title: string;
   description?: string;
@@ -156,10 +161,28 @@ export function SectionCard({
   children: ReactNode;
   className?: string;
   capped?: boolean;
+  draggable?: boolean;
+  dragging?: boolean;
+  onDragStart?: (event: DragEvent<HTMLElement>) => void;
+  onDragEnd?: () => void;
+  onDragOver?: (event: DragEvent<HTMLElement>) => void;
 }) {
   return (
-    <Card className={cn(capped && "section-window", className)}>
-      <CardHeader>
+    <Card
+      data-bento-dragging={dragging ? "true" : undefined}
+      className={cn(capped && "section-window", className)}
+    >
+      <CardHeader
+        draggable={draggable}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+        className={cn(
+          "transition-[background-color,box-shadow] duration-200 ease-out",
+          draggable && "cursor-grab select-none active:cursor-grabbing",
+          dragging && "bg-accent/35 shadow-sm",
+        )}
+      >
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0">
             <CardTitle>{title}</CardTitle>

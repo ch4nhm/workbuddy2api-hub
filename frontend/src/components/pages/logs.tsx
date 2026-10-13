@@ -23,14 +23,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { EmptyState, PageFrame, PageHeader, SectionCard } from "@/components/shared";
@@ -140,7 +142,11 @@ export function LogsPage({ dashboard }: { dashboard: DashboardController }) {
               <Switch size="sm" checked={auto} onCheckedChange={setAuto} />
             </div>
             <Button variant="outline" size="sm" disabled={refreshing} onClick={() => void refresh()}>
-              <RefreshCwIcon data-icon="inline-start" className={refreshing ? "animate-spin" : undefined} />
+              {refreshing ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <RefreshCwIcon data-icon="inline-start" />
+              )}
               刷新
             </Button>
             <AlertDialog>
@@ -216,26 +222,29 @@ export function LogsPage({ dashboard }: { dashboard: DashboardController }) {
                 <SelectValue placeholder="来源" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部来源</SelectItem>
-                {tags.map((item) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectItem value="all">全部来源</SelectItem>
+                  {tags.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
         }
       >
-        <div className="mb-3 relative">
-          <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
+        <InputGroup className="mb-3">
+          <InputGroupAddon align="inline-start">
+            <SearchIcon />
+          </InputGroupAddon>
+          <InputGroupInput
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="搜索日志内容或来源…"
-            className="pl-8"
           />
-        </div>
+        </InputGroup>
 
         {filtered.length ? (
           <div className="log-terminal max-h-[calc(100svh-22rem)] min-h-72 overflow-auto rounded-lg border border-border/70 p-3 font-mono text-xs leading-relaxed">

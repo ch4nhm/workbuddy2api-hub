@@ -162,11 +162,12 @@ export function useDashboard() {
   const loadRealm = useCallback(async () => {
     const realmResponse = await getJSON<{ current: Realm; options: Realm[] }>("/realm");
     const pinnedView = initialRealmView();
+    const viewRealm = pinnedView || realmResponse.current;
     patch({
       activeRealm: realmResponse.current,
-      viewRealm: pinnedView || realmResponse.current,
+      viewRealm,
     });
-    return realmResponse.current;
+    return viewRealm;
   }, [patch]);
 
   const loadAccounts = useCallback(async () => {
@@ -185,8 +186,7 @@ export function useDashboard() {
     }
   }, [patch]);
 
-  const loadModels = useCallback(async () => {
-    const realm = stateRef.current.viewRealm;
+  const loadModels = useCallback(async (realm = stateRef.current.viewRealm) => {
     const response = await getJSON<{ data: Model[] }>(
       `/v1/models?realm=${encodeURIComponent(realm)}`,
     );
@@ -221,11 +221,12 @@ export function useDashboard() {
   }, [patch]);
 
   const loadAnalytics = useCallback(
-    async (range = rangeRef.current) => {
+    async (range = rangeRef.current, realm = stateRef.current.viewRealm) => {
+      const query = new URLSearchParams({ range, realm });
       const [analytics, timeseries, perf] = await Promise.all([
-        getJSON<AnalyticsResponse>(`/usage/analytics?range=${range}`, POLL_READ),
-        getJSON<TimeseriesResponse>(`/usage/timeseries?range=${range}`, POLL_READ),
-        getJSON<PerfResponse>(`/usage/perf?range=${range}`, POLL_READ),
+        getJSON<AnalyticsResponse>(`/usage/analytics?${query}`, POLL_READ),
+        getJSON<TimeseriesResponse>(`/usage/timeseries?${query}`, POLL_READ),
+        getJSON<PerfResponse>(`/usage/perf?${query}`, POLL_READ),
       ]);
       patch({ analytics, timeseries, perf });
     },
@@ -259,10 +260,6 @@ export function useDashboard() {
     timers.current = [
       window.setInterval(() => {
         if (document.hidden) return;
-        if (tabRef.current === "analytics") void loadAnalytics();
-      }, 5000),
-      window.setInterval(() => {
-        if (document.hidden) return;
         void refresh();
       }, 5000),
       window.setInterval(() => {
@@ -280,14 +277,14 @@ export function useDashboard() {
     patch({ loading: true });
     try {
       await loadSettings();
-      await loadRealm();
+      const realm = await loadRealm();
       await Promise.allSettled([
         loadAccounts(),
-        loadModels(),
+        loadModels(realm),
         loadTasks(),
         loadScheduler(),
         loadUsage(),
-        loadAnalytics(),
+        loadAnalytics(rangeRef.current, realm),
         loadAgents(),
         loadLogs(300),
       ]);
@@ -390,9 +387,14 @@ export function useDashboard() {
   const setViewRealm = useCallback(
     async (realm: Realm) => {
       patch({ viewRealm: realm });
-      await Promise.allSettled([loadModels(), loadTasks(), loadAccounts()]);
+      await Promise.allSettled([
+        loadModels(realm),
+        loadTasks(),
+        loadAccounts(),
+        loadAnalytics(rangeRef.current, realm),
+      ]);
     },
-    [loadAccounts, loadModels, loadTasks, patch],
+    [loadAccounts, loadAnalytics, loadModels, loadTasks, patch],
   );
 
   const setActiveRealm = useCallback(
@@ -401,16 +403,21 @@ export function useDashboard() {
       const current = response.current || realm;
       patch({ activeRealm: current, viewRealm: current });
       toast.success(`网关默认上游已切换为${current === "cn" ? "国内版" : "国际版"}`);
-      await Promise.allSettled([loadAccounts(), loadModels(), loadTasks()]);
+      await Promise.allSettled([
+        loadAccounts(),
+        loadModels(current),
+        loadTasks(),
+        loadAnalytics(rangeRef.current, current),
+      ]);
     },
-    [loadAccounts, loadModels, loadTasks, patch],
+    [loadAccounts, loadAnalytics, loadModels, loadTasks, patch],
   );
 
   const changeAnalyticsRange = useCallback(
     (range: AnalyticsRange) => {
       setAnalyticsRange(range);
       rangeRef.current = range;
-      void loadAnalytics(range);
+      return loadAnalytics(range, stateRef.current.viewRealm);
     },
     [loadAnalytics],
   );

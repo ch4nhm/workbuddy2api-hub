@@ -65,7 +65,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Progress } from "@/components/ui/progress";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -153,7 +155,7 @@ function AccountActions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon-sm" disabled={busy} aria-label="账号操作">
-          {busy ? <RefreshCwIcon className="animate-spin" /> : <EllipsisIcon />}
+          {busy ? <Spinner /> : <EllipsisIcon />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-48">
@@ -521,15 +523,16 @@ export function AccountsPage({ dashboard }: { dashboard: DashboardController }) 
         description="筛选结果仅影响当前视图，不会修改账号数据。"
       >
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-72">
-            <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
+          <InputGroup className="w-full sm:max-w-72">
+            <InputGroupAddon align="inline-start">
+              <SearchIcon />
+            </InputGroupAddon>
+            <InputGroupInput
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="搜索昵称、UID、备注…"
-              className="pl-8"
             />
-          </div>
+          </InputGroup>
           <div className="flex flex-wrap items-center gap-2">
             <ToggleGroup
               type="single"
@@ -857,7 +860,7 @@ export function AccountsPage({ dashboard }: { dashboard: DashboardController }) 
               取消
             </Button>
             <Button disabled={savingNote} onClick={() => void saveNote()}>
-              {savingNote ? <RefreshCwIcon data-icon="inline-start" className="animate-spin" /> : null}
+              {savingNote ? <Spinner data-icon="inline-start" /> : null}
               保存备注
             </Button>
           </DialogFooter>
