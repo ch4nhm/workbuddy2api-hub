@@ -194,6 +194,7 @@ export function LogsPage({ dashboard }: { dashboard: DashboardController }) {
       <SectionCard
         title="事件流"
         description="最新事件排在最下方，自动刷新开启时每 5 秒同步一次。"
+        capped={false}
         action={
           <div className="flex flex-wrap items-center justify-end gap-2">
             <ToggleGroup

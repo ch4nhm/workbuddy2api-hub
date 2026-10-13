@@ -148,15 +148,17 @@ export function SectionCard({
   action,
   children,
   className,
+  capped = true,
 }: {
   title: string;
   description?: string;
   action?: ReactNode;
   children: ReactNode;
   className?: string;
+  capped?: boolean;
 }) {
   return (
-    <Card className={cn(className)}>
+    <Card className={cn(capped && "section-window", className)}>
       <CardHeader>
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0">

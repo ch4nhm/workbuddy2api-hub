@@ -177,9 +177,42 @@ function SecurityTab({ dashboard }: { dashboard: DashboardController }) {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [savingPwd, setSavingPwd] = useState(false);
+  const [winMaxHeight, setWinMaxHeight] = useState("640");
+  const [savingWinMax, setSavingWinMax] = useState(false);
 
   const hidden = useMemo(() => new Set(settings?.hidden_pages || []), [settings]);
   const uiLanguage = (settings?.ui_language as Language) || "zh";
+
+  useEffect(() => {
+    const raw = settings?.section_max_height;
+    const value = typeof raw === "number" && Number.isFinite(raw) && raw >= 0 ? raw : 640;
+    setWinMaxHeight(String(Math.round(value)));
+  }, [settings?.section_max_height]);
+
+  const winMaxCapped =
+    typeof settings?.section_max_height === "number" && settings.section_max_height > 0;
+
+  async function saveWinMaxHeight() {
+    const raw = winMaxHeight.trim();
+    const value = Number(raw);
+    // 空输入框要显式拦下：Number('') 是 0，放过去就是「清空即关闭」限高。
+    if (raw === "" || !Number.isFinite(value) || value < 0) {
+      toast.warning("请填写 0 或正数（像素）");
+      return;
+    }
+    const rounded = Math.min(Math.round(value), 4000);
+    setSavingWinMax(true);
+    try {
+      await save(
+        { section_max_height: rounded },
+        rounded > 0 ? `窗口最高高度已设为 ${rounded}px` : "已取消窗口限高（不限）",
+      );
+    } catch {
+      // performAction already surfaced the failure toast.
+    } finally {
+      setSavingWinMax(false);
+    }
+  }
 
   async function changePassword() {
     if (!current || !next) {
@@ -405,6 +438,37 @@ function SecurityTab({ dashboard }: { dashboard: DashboardController }) {
               onCheckedChange={(value) => void save({ key_before_hidden: value }, "布局偏好已保存")}
             />
           </FieldGroup>
+        </SectionCard>
+
+        <SectionCard
+          title="面板窗口限高"
+          description="区块超过该高度时只在窗口内部滚动，标题行固定在窗口顶部，整页不再被单个区块拉长。"
+          action={<Badge variant="outline">{winMaxCapped ? `${settings?.section_max_height}px` : "不限"}</Badge>}
+        >
+          <Field>
+            <FieldLabel htmlFor="window-max-height">窗口最高高度（像素，0 = 不限）</FieldLabel>
+            <Input
+              id="window-max-height"
+              type="number"
+              min={0}
+              max={4000}
+              step={20}
+              value={winMaxHeight}
+              onChange={(event) => setWinMaxHeight(event.target.value)}
+              className="font-mono"
+            />
+            <FieldDescription>默认 640，填写 0 表示不限，上限 4000。</FieldDescription>
+          </Field>
+          <div className="mt-4 flex justify-end">
+            <Button disabled={savingWinMax} onClick={() => void saveWinMaxHeight()}>
+              {savingWinMax ? (
+                <RefreshCwIcon data-icon="inline-start" className="animate-spin" />
+              ) : (
+                <CheckIcon data-icon="inline-start" />
+              )}
+              保存限高
+            </Button>
+          </div>
         </SectionCard>
 
         <SectionCard title="管理员会话" description="退出后需要重新输入面板密码。">

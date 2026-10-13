@@ -272,6 +272,7 @@ export interface Settings {
   egress_backoff_enabled?: boolean;
   accounts_collapsed?: boolean;
   accounts_separate_tab?: boolean;
+  section_max_height?: number;
   key_before_hidden?: boolean;
   hidden_pages?: string[];
   update_check_enabled?: boolean;

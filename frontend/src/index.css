@@ -195,6 +195,34 @@
   box-shadow: inset -1px 0 0 var(--sidebar-border);
 }
 
+/*
+ * 面板窗口限高：区块超过 --win-max-h 时改为窗口内部滚动、标题行吸顶，整页不再被
+ * 单个区块拉长。--win-max-h 由 workbuddy-app 按服务端 section_max_height 写入，
+ * 只有 body 挂上 win-capped 时下列规则才生效；限高为 0（不限）时完全不影响版式。
+ * 卡片自带 padding-top 会让吸顶标题下方漏出滚动内容，故置 0 并挪给标题行。
+ */
+:root {
+  --win-max-h: 640px;
+}
+
+.win-capped .section-window {
+  max-height: var(--win-max-h);
+  overflow-y: auto;
+  padding-top: 0;
+}
+
+.win-capped .section-window > [data-slot="card-header"] {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-top: var(--card-spacing);
+  background: var(--card);
+}
+
+.win-capped .log-terminal {
+  max-height: var(--win-max-h);
+}
+
 [data-slot="table-row"] {
   transition:
     background-color 160ms ease,

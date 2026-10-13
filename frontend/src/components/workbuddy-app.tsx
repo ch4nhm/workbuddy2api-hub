@@ -340,6 +340,23 @@ export function WorkBuddyApp() {
     !authenticated &&
     Boolean(state.panelStatus.panel_password_required);
 
+  // 面板窗口限高：把服务端 section_max_height 落到 CSS 变量与 body 类上，限高为 0
+  // （不限）时移除变量与类，版式与从前一致。字段缺失或存坏时按默认 640 处理，与
+  // 后端 wb_settings.section_max_height 的回落口径保持一致。
+  const sectionMaxHeight = state.settings?.section_max_height;
+  useEffect(() => {
+    const known =
+      typeof sectionMaxHeight === "number" &&
+      Number.isFinite(sectionMaxHeight) &&
+      sectionMaxHeight >= 0;
+    const value = known ? sectionMaxHeight : 640;
+    const on = value > 0;
+    const root = document.documentElement;
+    if (on) root.style.setProperty("--win-max-h", `${Math.round(value)}px`);
+    else root.style.removeProperty("--win-max-h");
+    document.body.classList.toggle("win-capped", on);
+  }, [sectionMaxHeight]);
+
   if (state.loading && !authenticated) return <AppSkeleton />;
   if (needsLogin) {
     return (
